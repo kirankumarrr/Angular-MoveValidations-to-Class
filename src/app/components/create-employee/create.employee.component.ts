@@ -37,7 +37,7 @@ export class CreateEmployeeComponent implements OnInit {
     },
     email: {
       required: "Email is required.",
-      emailDomain: "Email Doamin should end with gmail.com"
+      emailDomain: "Email Doamin should end with dell.com"
     },
     phone: {
       required: "Phone is required."
@@ -63,7 +63,7 @@ export class CreateEmployeeComponent implements OnInit {
       ],
       contactPreference: ["email"],
       //Adding Custom Validator
-      email: ["", [Validators.required, emailDomain]],
+      email: ["", [Validators.required, emailDomain("dell.com")]],
       phone: [""],
       skills: this.fb.group({
         skillName: ["", Validators.required],
@@ -139,13 +139,29 @@ export class CreateEmployeeComponent implements OnInit {
   }
 }
 
-function emailDomain(control: AbstractControl): { [key: string]: any } | null {
-  const email: string = control.value;
-  const domain = email.substring(email.lastIndexOf("@") + 1);
-  if (email === "" || domain === "gmail.com") {
-    return null;
-  } else {
-    //here you should only return object
-    return { emailDomain: true };
-  }
+// function emailDomain(control: AbstractControl): { [key: string]: any } | null {
+//   const email: string = control.value;
+//   const domain = email.substring(email.lastIndexOf("@") + 1);
+//   if (email === "" || domain === "gmail.com") {
+//     return null;
+//   } else {
+//     //here you should only return object
+//     return { emailDomain: true };
+//   }
+// }
+
+//Here we are going to create a function that takes parameter and we never hard code our domainName
+
+// We are usnig Clousers Concept over here
+function emailDomain(domainName: string) {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const email: string = control.value;
+    const domain = email.substring(email.lastIndexOf("@") + 1);
+    if (email === "" || domain.toLowerCase() === domainName.toLowerCase()) {
+      return null;
+    } else {
+      //here you should only return object
+      return { emailDomain: true };
+    }
+  };
 }
