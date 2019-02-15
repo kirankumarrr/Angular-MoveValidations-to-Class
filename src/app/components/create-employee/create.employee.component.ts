@@ -6,6 +6,8 @@ import {
   Validators,
   AbstractControl
 } from "@angular/forms";
+import { CustomeValidators } from "../shared/custome.validators";
+
 @Component({
   selector: "create-employee",
   templateUrl: "./create.employee.component.html",
@@ -63,7 +65,10 @@ export class CreateEmployeeComponent implements OnInit {
       ],
       contactPreference: ["email"],
       //Adding Custom Validator
-      email: ["", [Validators.required, emailDomain("dell.com")]],
+      email: [
+        "",
+        [Validators.required, CustomeValidators.emailDomain("dell.com")]
+      ],
       phone: [""],
       skills: this.fb.group({
         skillName: ["", Validators.required],
@@ -153,15 +158,17 @@ export class CreateEmployeeComponent implements OnInit {
 //Here we are going to create a function that takes parameter and we never hard code our domainName
 
 // We are usnig Clousers Concept over here
-function emailDomain(domainName: string) {
-  return (control: AbstractControl): { [key: string]: any } | null => {
-    const email: string = control.value;
-    const domain = email.substring(email.lastIndexOf("@") + 1);
-    if (email === "" || domain.toLowerCase() === domainName.toLowerCase()) {
-      return null;
-    } else {
-      //here you should only return object
-      return { emailDomain: true };
-    }
-  };
-}
+// function emailDomain(domainName: string) {
+//   return (control: AbstractControl): { [key: string]: any } | null => {
+//     const email: string = control.value;
+//     const domain = email.substring(email.lastIndexOf("@") + 1);
+//     if (email === "" || domain.toLowerCase() === domainName.toLowerCase()) {
+//       return null;
+//     } else {
+//       //here you should only return object
+//       return { emailDomain: true };
+//     }
+//   };
+// }
+
+//Commenting above function because we goona reuse this just as minLength Validators
