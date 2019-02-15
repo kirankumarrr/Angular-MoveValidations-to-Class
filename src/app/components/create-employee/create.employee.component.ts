@@ -24,6 +24,7 @@ export class CreateEmployeeComponent implements OnInit {
     fullName: "",
     contactPreference: "",
     email: "",
+    confimEmail: "",
     phone: "",
     skillName: "",
     experienceInYears: "",
@@ -41,6 +42,12 @@ export class CreateEmployeeComponent implements OnInit {
       required: "Email is required.",
       emailDomain: "Email Doamin should end with dell.com"
     },
+    confimEmail: {
+      required: "Confirm Email is required."
+    },
+    emailGroup : {
+      
+    }
     phone: {
       required: "Phone is required."
     },
@@ -65,10 +72,18 @@ export class CreateEmployeeComponent implements OnInit {
       ],
       contactPreference: ["email"],
       //Adding Custom Validator
-      email: [
-        "",
-        [Validators.required, CustomeValidators.emailDomain("dell.com")]
-      ],
+      emailGroup: this.fb.group(
+        {
+          email: [
+            "",
+            [Validators.required, CustomeValidators.emailDomain("dell.com")]
+          ],
+          confimEmail: ["", Validators.required]
+          //you should understand  that custom created validator attached to emailGroup:bocz its groping 2 errors
+        },
+        { validator: emailCheck }
+      ),
+
       phone: [""],
       skills: this.fb.group({
         skillName: ["", Validators.required],
@@ -172,3 +187,18 @@ export class CreateEmployeeComponent implements OnInit {
 // }
 
 //Commenting above function because we goona reuse this just as minLength Validators
+
+//Creating a newconfirmEmail
+function emailCheck(group: AbstractControl): { [key: string]: any } | null {
+  const email = group.get("email");
+  const confirmEmail = group.get("confirmEmail");
+  if (
+    email.value === "" &&
+    confirmEmail.value === "" &&
+    email.value === confirmEmail.value
+  ) {
+    return null;
+  } else {
+    return { emailCheck: true };
+  }
+}
