@@ -3,7 +3,8 @@ import {
   FormGroup,
   FormControl,
   FormBuilder,
-  Validators
+  Validators,
+  AbstractControl
 } from "@angular/forms";
 @Component({
   selector: "create-employee",
@@ -19,7 +20,9 @@ export class CreateEmployeeComponent implements OnInit {
   // corresponding form control
   formErrors = {
     fullName: "",
+    contactPreference: "",
     email: "",
+    phone: "",
     skillName: "",
     experienceInYears: "",
     proficiency: ""
@@ -33,7 +36,11 @@ export class CreateEmployeeComponent implements OnInit {
       maxlength: "Full Name must be less than 10 characters."
     },
     email: {
-      required: "Email is required."
+      required: "Email is required.",
+      emailDomain: "Email Doamin should end with gmail.com"
+    },
+    phone: {
+      required: "Phone is required."
     },
     skillName: {
       required: "Skill Name is required."
@@ -46,13 +53,18 @@ export class CreateEmployeeComponent implements OnInit {
     }
   };
 
+  //Instead of creating function we can this other way
+
   ngOnInit() {
     this.employeeForm = this.fb.group({
       fullName: [
         "",
         [Validators.required, Validators.minLength(2), Validators.maxLength(10)]
       ],
-      email: ["", Validators.required],
+      contactPreference: ["email"],
+      //Adding Custom Validator
+      email: ["", [Validators.required, emailDomain]],
+      phone: [""],
       skills: this.fb.group({
         skillName: ["", Validators.required],
         experienceInYears: ["", Validators.required],
@@ -64,8 +76,24 @@ export class CreateEmployeeComponent implements OnInit {
     this.employeeForm.valueChanges.subscribe(data => {
       this.logValidationErrors(this.employeeForm);
     });
+    this.employeeForm
+      .get("contactPreference")
+      .valueChanges.subscribe((data: string) => {
+        this.contactPreferenceChange(data);
+      });
   }
-
+  contactPreferenceChange(selectedValue: string) {
+    const phoneControl = this.employeeForm.get("phone");
+    if (selectedValue === "phone") {
+      phoneControl.setValidators(Validators.required);
+      //Incase you want to set more than one validator
+      // phoneControl.setValidator([Validators.required, Validators.minLength(3)]);
+    } else {
+      phoneControl.clearValidators();
+    }
+    //After clearValidator if you want to trigger immediately you neeed to call updateValueAndValidity()
+    phoneControl.updateValueAndValidity();
+  }
   logValidationErrors(group: FormGroup = this.employeeForm): void {
     // Loop through each control key in the FormGroup
     Object.keys(group.controls).forEach((key: string) => {
@@ -108,5 +136,16 @@ export class CreateEmployeeComponent implements OnInit {
   onLoadDataClick(): void {
     // this.logValidationErrors(this.employeeForm);
     // console.log(this.formErrors);
+  }
+}
+
+function emailDomain(control: AbstractControl): { [key: string]: any } | null {
+  const email: string = control.value;
+  const domain = email.substring(email.lastIndexOf("@") + 1);
+  if (email === "" || domain === "gmail.com") {
+    return null;
+  } else {
+    //here you should only return object
+    return { emailDomain: true };
   }
 }
